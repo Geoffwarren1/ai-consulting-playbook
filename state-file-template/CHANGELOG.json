@@ -1,0 +1,26 @@
+{
+  "customer": "[Customer Name]",
+  "log": [
+    {
+      "date": "YYYY-MM-DD",
+      "signal_type": "call | ticket | email | usage_data | renewal | manual",
+      "signal_source": "[Source — Gong call ID, Zendesk ticket, email thread, etc.]",
+      "processed_by": "agent | human",
+      "summary": "One-line description of what happened",
+      "state_changes": {
+        "dimension_scores": {
+          "[dimension_name]": { "from": 0, "to": 0 }
+        },
+        "risks_opened": ["RISK-N"],
+        "risks_closed": [],
+        "opps_opened": [],
+        "opps_closed": [],
+        "workstreams_updated": ["W-N"]
+      },
+      "facts_added": [
+        "Specific fact extracted from the signal"
+      ],
+      "notes": "Anything notable about this signal or why it changed the state"
+    }
+  ]
+}
