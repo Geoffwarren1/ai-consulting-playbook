@@ -1,49 +1,74 @@
-# AI Consulting Playbook — Autonomous Agent Patterns
+# Agent Operations Playbook
 
-A set of reusable frameworks for designing autonomous agents that run operational workflows in enterprise B2B SaaS companies. Built from firsthand experience designing and shipping an autonomous Customer Success agent system.
+How to design, govern, and validate AI agents that run real operational work, not just assist with it.
+
+I built these patterns while designing and shipping an autonomous agent system for a Customer Success team at an enterprise data company. The agent pulled signals from calls, tickets, usage data, and email, kept a running picture of every account, and turned that into prioritized work for the team. This repo is the operating model behind it, written up so it can be reused in any function.
+
+**Author:** Geoff Warren
 
 ---
 
-## What's Here
+## The core idea
+
+Most AI rollouts stop at "humans do the work, AI assists." That makes individuals a little faster. It doesn't change how a company scales.
+
+The pattern here flips it: **agents run the repeatable operational work, and people handle judgment, relationships, and exceptions.** Throughput grows without headcount growing at the same rate.
+
+That only works if three things are true:
+
+- **Context is persistent.** The agent keeps its knowledge in plain, version-controlled files, not in someone's head or a single chat window.
+- **Every action is auditable.** Every change links back to the signal that caused it, so you can replay and correct it.
+- **Accuracy is measured before it's trusted.** Agents are tested against real answers before they go live, and tested again after every change.
+
+---
+
+## What's in this repo
 
 | Document | What it covers |
 |----------|---------------|
-| [autonomous-cs-agent-pattern.md](autonomous-cs-agent-pattern.md) | The core architecture: Sense→Interpret→Plan→Act pipeline, 4 operating modes, the "agent-led operations" inversion |
-| [state-file-template/](state-file-template/) | Generic state file templates (STATE, RISK_OPP, DESTINATION, CHANGELOG) for persistent agent memory |
-| [skill-design-pattern.md](skill-design-pattern.md) | How to stratify Claude Code skills into Foundation / Company / Account layers |
-| [signal-pipeline-pattern.md](signal-pipeline-pattern.md) | How to wire multi-source signals into a unified processing pipeline |
-| [health-model-design-guide.md](health-model-design-guide.md) | How to design a multi-dimensional, evidence-backed health scoring framework |
-| [agent-validation-guide.md](agent-validation-guide.md) | How to measure and improve agent accuracy before and after production |
+| [autonomous-cs-agent-pattern.md](autonomous-cs-agent-pattern.md) | The core architecture: the Sense → Interpret → Plan → Act pipeline, the four operating modes, and when a human steps in |
+| [state-file-template/](state-file-template/) | The context layer: templates for STATE, RISK_OPP, DESTINATION, and CHANGELOG files that give the agent memory and an audit trail |
+| [signal-pipeline-pattern.md](signal-pipeline-pattern.md) | How to feed signals from many sources into one processing flow, including what to do when sources disagree |
+| [skill-design-pattern.md](skill-design-pattern.md) | How to split agent knowledge into three layers (general, company, and account) so it stays reusable |
+| [health-model-design-guide.md](health-model-design-guide.md) | How to build evidence-backed scoring, where every score traces back to a fact |
+| [agent-validation-guide.md](agent-validation-guide.md) | How to measure accuracy before and after launch: ground-truth sets, accuracy scoring, failure analysis, and regression testing |
 
 ---
 
-## The Core Idea
+## Beyond Customer Success
 
-Traditional enterprise workflows: **humans do the work, AI assists.**
+The first build was for Customer Success, but nothing in the architecture is CS-specific. Any function with lots of signals, repeatable decisions, and a need for traceability fits the same pattern:
 
-The pattern documented here: **agents do the operational work, humans handle exceptions and relationships.**
+| Function | Sense (signals) | Interpret | Plan / Act |
+|----------|----------------|-----------|------------|
+| **Operations** | Orders, bookings, vendor updates, exceptions | What changed, and what's at risk of a service failure? | Route exceptions, flag capacity gaps, draft vendor outreach |
+| **Sales** | Calls, email, CRM activity, intent data | Deal health, stalled deals, expansion signals | Next-best actions, follow-up drafts, pipeline alerts |
+| **Finance** | Invoices, contracts, usage, payment data | Billing gaps, collections risk, forecast changes | Queue reconciliations, flag anomalies, prep variance notes |
+| **Support** | Tickets, chat, product telemetry | Recurring issues, escalation risk | Triage, draft responses, surface issues for product teams |
 
-This works when:
-- The domain has high signal volume that exceeds human processing capacity
-- The operational work is repetitive, traceable, and auditable
-- Human judgment is needed for relationship, executive, and ethical decisions — not routine state management
-- You have access to multi-source data that needs synthesis
+The rollout approach is the same in each function:
 
----
-
-## How to Use This
-
-These are frameworks, not copy-paste code. For each client engagement:
-
-1. Start with **autonomous-cs-agent-pattern.md** to align on the architecture and operating model
-2. Use **health-model-design-guide.md** to design a domain-specific health framework with the client
-3. Use **state-file-template/** as a starting point; customize dimensions and fields to the client's domain
-4. Use **skill-design-pattern.md** to design the skill layer (what generic knowledge goes in foundations, what's company-specific)
-5. Use **signal-pipeline-pattern.md** to map their existing data sources and design the ingestion layer
-6. Use **agent-validation-guide.md** to build a validation plan before any production deployment
+1. **Pick use cases by outcome, not by excitement.** Start where the signal volume is already more than people can process and the result can be measured.
+2. **Build the context layer first.** Before any agent can be accurate, it needs a governed source of truth.
+3. **Validate, then automate.** Build a ground-truth set with the people who know the domain, measure the agent against it, and only then let it act on its own.
+4. **Keep humans on judgment.** Define up front which decisions go to a person, and review outputs rather than redoing inputs.
+5. **Each launch should make the next one faster.** Shared skills, templates, and validation sets mean use case #5 costs much less than use case #1.
 
 ---
 
-## Important: Legal Note
+## How to use this
 
-These frameworks reflect general architectural patterns and methodologies. They do not contain proprietary data, customer information, or source code from any employer or client. Before applying any of these patterns to client work, ensure your engagement contracts permit it.
+These are frameworks, not code to copy and paste. A typical sequence:
+
+1. Start with the **agent pattern** to agree on the operating model and where humans step in.
+2. Map existing data sources with the **signal pipeline** pattern.
+3. Set up the **state files** as the context and audit layer.
+4. Design the **skill layer**: what's general, what's company-specific, and what's specific to each account or case.
+5. Define scoring with the **health model** guide, where it applies.
+6. Run the **validation guide** before anything goes to production, and keep running it afterward.
+
+---
+
+## Note on sources
+
+These are general patterns and methods. They contain no proprietary data, customer information, or source code from any employer.
